@@ -15,7 +15,7 @@ from app.lib.core.agent import Controller
 from app.extensions import mongo
 
 
-@admin.route("/domian_lists", methods=["GET"])
+@admin.route("/domain_lists", methods=["GET"])
 @admin_required
 def domains():
     if request.method == "GET":
@@ -45,10 +45,10 @@ def domains():
             'page_list': page_list
         }
 
-        return render_template('domain/domians_list.html', datas=datas)
+        return render_template('domain/domains_list.html', datas=datas)
 
 
-@admin.route("/domian_add", methods=["GET"])
+@admin.route("/domain_add", methods=["GET"])
 @admin_required
 def domains_add():
     if request.method == "GET":
@@ -69,7 +69,7 @@ def domains_controllers():
         action = request.form.get('action', None)
 
         if action == "add":
-            if project == None or domain_name == None or len(project) == 0:
+            if project is None or domain_name is None or len(project) == 0:
                 result = {"status": 403, "msg": "值不能为空"}
                 return jsonify(result)
 
@@ -134,7 +134,7 @@ def domains_controllers():
                 result = {"status": 403, "msg": "没有域名结果"}
                 return jsonify(result)
 
-            if mongo.db.exports.find_one({"pid": task_id}) != None:
+            if mongo.db.exports.find_one({"pid": task_id}) is not None:
                 result = {"status": 403, "msg": "任务已存在，请前往导出页面查看"}
                 return jsonify(result)
 

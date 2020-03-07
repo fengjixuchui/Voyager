@@ -8,8 +8,6 @@
 
 ![展示](img/img0.png)
 
-**系统数据是伪造的**
-
 ## 0x02 系统结构
 
 ### 开发框架
@@ -34,6 +32,8 @@ Web框架: **Flask(1.1.1)**
 ### 0x001 域名扫描
 采用的是[oneforall](https://github.com/shmilylty/OneForAll)，当前使用的版本是0.0.9,我修改了部分代码，使得工具和平台能够结合
 
+**关于单个任务进度条的提示:ap0llo/oneforall:0.0.8还是存在单个任务进度统计的，但是ap0llo/oneforall:0.0.9由于oneforall代码结构的变化，无法将爆破任务的进度数据分离出来，所以无法统计，在200M宽带下，单个域名扫描任务需要时间最长六分钟，从0.00%直接跳到100.00%**
+
 ![](img/img5.png)
 
 ### 0x002 端口扫描
@@ -52,6 +52,8 @@ Web框架: **Flask(1.1.1)**
 ### 0x005 漏洞扫描
 漏洞扫描功能现在引入了xunfeng和kunpeng的poc，一共144个，标签以nmap的标签为主，比如445端口的标签是microsoft-ds， 3389的标签是ms-wbt-server。这两个框架合并存在一定问题，比如说:xunfeng和kunpeng的poc主要针对非WEB应用，两个框架的POC存在重复的问题.我做了一定的去重工作，后期随着POC的增多，去重会是一个问题
 
+**漏洞扫描的任务只能从端口扫描和指纹识别的数据中继承，也就是说必须完成端口扫描或者是指纹识别才能获取到数据**
+
 ### 0x006 WAF探测
 分析了一下sqlmap的源代码，从中提取出了sqlmap用于WAF探测的代码并进行了封装, 用来探测类http端口是否有WAF保护，此功能并未在前台展示，一些模块比如目录扫描会自动进行调用
 
@@ -62,21 +64,10 @@ Web框架: **Flask(1.1.1)**
 
 这里以Kali linux 2019.4作为基础操作系统
 
-### 0x001 安装docker 
-由于Kali默认没有安装Docker，需要手动安装
-
-```bash
-# curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-# echo 'deb [arch=amd64] https://download.docker.com/linux/debian buster stable' > /etc/apt/sources.list.d/docker.list
-# apt-get update && apt-get install docker-ce
-# systemctl enable docker
-# systemctl start docker
-```
-
-![](img/img3.png)
 
 
-### 0x002 下载源码安装
+### 0x001 下载源码安装
+我把步骤都写在run.sh里了，理论上run.sh适应与Debian系操作系统(包括Debian, Kali, Ubuntu)
 
 ```bash
 git clone https://github.com/ody5sey/Voyager.git
@@ -84,10 +75,11 @@ cd Voyager
 bash run.sh
 ```
 
-
-### 0x003 运行
+### 0x002 运行
 
 ```bash
+source ~/.bashrc
+pipenv shell
 python manager.py
 ```
 
