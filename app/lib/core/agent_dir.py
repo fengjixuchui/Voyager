@@ -258,7 +258,7 @@ class ControllerDirs():
             if task is None:
                 return True
 
-            if mongo.db.tasks.find({'status': "Running", "hack_type": "目录扫描"}).count() > 0:
+            if mongo.db.tasks.find({'status': "Running", "hack_type": "目录扫描"}).count() > 1:
                 mongo.db.tasks.update_one(
                     {"id": pid},
                     {'$set': {
