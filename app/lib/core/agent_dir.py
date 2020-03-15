@@ -252,11 +252,17 @@ class ControllerDirs():
     def thread_start(cls, method, task_name, project, pid):
 
         while True:
+
+            task = mongo.db.tasks.find_one({'id': pid})
+
+            if task is None:
+                return True
+
             if mongo.db.tasks.find({'status': "Running", "hack_type": "目录扫描"}).count() > 0:
                 mongo.db.tasks.update_one(
                     {"id": pid},
                     {'$set': {
-                        'status': 'Wait',
+                        'status': 'Waiting',
                     }
                     }
                 )

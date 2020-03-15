@@ -20,6 +20,9 @@ from app.blueprint import admin
 from app.blueprint import admin_required
 from app.extensions import mongo
 
+from app.config import THREADS
+from app.config import RATE
+
 
 @admin.route("/port_lists", methods=["GET"])
 @admin_required
@@ -111,10 +114,6 @@ def ports_controllers():
 
             if target_id is None and len(ip_address) > 0:
                 port = ",".join(ports.split("\n"))
-                # target = str([",".join(ip_address.split("\n")), port])
-                # target = str([",".join([i for i in ip_address.split("\n") if len(i) > 0]), port])
-                target = json.dumps([",".join([i for i in ip_address.split("\n") if len(i) > 0]), port],
-                                    ensure_ascii=False)
 
                 len_ip = get_ip_list(ip_address.split("\n"))
 
@@ -125,6 +124,11 @@ def ports_controllers():
                 if not get_port_list(ports.split("\n")):
                     result = {"status": 403, "msg": "端口地址格式错误"}
                     return jsonify(result)
+
+                target_dict = {"ips": ",".join([i for i in ip_address.split("\n") if len(i) > 0]), "ports": port,
+                               "rates": RATE, "threads": THREADS}
+
+                target = json.dumps(target_dict, ensure_ascii=False)
 
                 uid = get_uuid()
 
@@ -160,7 +164,6 @@ def ports_controllers():
 
                     port = ports.split("\n")
 
-                    ip_lists = [','.join(get_list_ip(ips_list)), ",".join(port)]
                     len_ip = get_ip_list(ips_list)
 
                     if not len_ip:
@@ -171,9 +174,15 @@ def ports_controllers():
                         result = {"status": 403, "msg": "端口地址格式错误"}
                         return jsonify(result)
 
+                    target_dict = {"ips": ','.join(get_list_ip(ips_list)), "ports": ",".join(port),
+                                   "rates": RATE, "threads": THREADS}
+
+                    target = json.dumps(target_dict, ensure_ascii=False)
+
                     uid = get_uuid()
                     task = {"id": uid, "create_date": datetime.datetime.now(), "parent_name": project,
-                            "target": str(ip_lists), "task_type": "即时任务", "hack_type": "端口扫描", "status": "Running",
+                            "target": target, "task_type": "即时任务",
+                            "hack_type": "端口扫描", "status": "Running",
                             "progress": "0.00%", "contain_id": "Null", "end_time": "Null",
                             "live_host": 0, "hidden_host": len_ip, "total_host": 0, "user": session.get("admin")}
 

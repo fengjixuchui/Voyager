@@ -163,8 +163,6 @@ def get_ip_list(ip_list):
     return len(ip_list_tmp)
 
 
-
-
 # 解析IP地址
 def get_list_ip(ip_list):
     """
@@ -232,7 +230,6 @@ def get_list_ip(ip_list):
         elif re.match(r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
                       ip):
             ip_list_tmp.append(ip)
-
 
     return ip_list_tmp
 
@@ -337,7 +334,6 @@ def get_md5(c):
     return psw
 
 
-
 # 判断是否为域名
 def is_domain(domain):
     domain_regex = re.compile(
@@ -351,4 +347,3 @@ def is_host(host):
         r'(^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$)',
         re.IGNORECASE)
     return True if ip_regex.match(host) else False
-

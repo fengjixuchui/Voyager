@@ -23,6 +23,7 @@ AWVS_HEADER = {"X-Auth": AWVS_API_KEY, "content-type": "application/json"}
 
 
 class AWVS():
+    target_list = list()
 
     def add_task(self, target):
         """
@@ -232,13 +233,14 @@ class AWVS():
             return
 
     def getreports(self, scan_id):
-        # 获取scan_id的扫描报告
-        '''
+
+        """
+        获取scan_id的扫描报告
         11111111-1111-1111-1111-111111111111    Developer
         21111111-1111-1111-1111-111111111111    XML
         11111111-1111-1111-1111-111111111119    OWASP Top 10 2013
         11111111-1111-1111-1111-111111111112    Quick
-        '''
+        """
         data = {"template_id": "11111111-1111-1111-1111-111111111111",
                 "source": {"list_type": "scans", "id_list": scan_id}}
         try:
@@ -249,7 +251,6 @@ class AWVS():
             result = response.headers["Location"]
 
             return result
-
 
         except Exception as e:
             print(e)
@@ -282,7 +283,7 @@ class AWVS():
 
         while True:
 
-            if mongo.db.tasks.find_one({"id": conf.awvs.pid}) == None:
+            if mongo.db.tasks.find_one({"id": conf.awvs.pid}) is None:
                 break
 
             if self.get_scan_status(scan_id):
@@ -296,9 +297,7 @@ class AWVS():
         self.target_queue = queue.Queue()
         self.new_queue = queue.Queue()
 
-        THREADS = 10
-
-        self.target_list = list()
+        THREADS = 1
 
         if conf.awvs.method == "adam":
 
@@ -373,7 +372,7 @@ class AWVS():
 
                 sess = mongo.db.tasks.find_one({"id": conf.awvs.pid})
 
-                if sess == None:
+                if sess is None:
 
                     if len(self.target_id_list) == 0:
                         break

@@ -9,6 +9,10 @@ DOCKER_CLIENT = docker.from_env()
 AWVS_API_KEY = "1986ad8c0a5b3df4d7028d5f3c06e936cb2bb5b2fe8454374af5bc8e350ec2da6"
 AWVS_HOST_ADDRESS = "https://127.0.0.1:13443/"
 
+# 端口扫描相关
+RATE = 10000
+THREADS = 6
+
 
 # Flask配置文件
 class BaseConfig(object):

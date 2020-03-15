@@ -47,11 +47,17 @@ class Controller(object):
 
         # 有任务在执行的时候先暂停
         while True:
+
+            task = mongo.db.tasks.find_one({'id': uid})
+
+            if task is None:
+                return True
+
             if mongo.db.tasks.find({'status': "Running", "hack_type": "域名扫描"}).count() > 0:
                 mongo.db.tasks.update_one(
                     {"id": uid},
                     {'$set': {
-                        'status': 'Wait',
+                        'status': 'Waiting',
                     }
                     }
                 )
@@ -141,10 +147,26 @@ class Controller(object):
             if task is None:
                 return True
 
-            if mongo.db.tasks.find({'status': "Running"}).count() > 1:
+            if mongo.db.tasks.find({'status': "Running", "hack_type": "端口扫描"}).count() > 0:
+                mongo.db.tasks.update_one(
+                    {"id": uid},
+                    {'$set': {
+                        'status': 'Waiting',
+                    }
+                    }
+                )
                 time.sleep(5)
 
             else:
+
+                mongo.db.tasks.update_one(
+                    {"id": uid},
+                    {'$set': {
+                        'status': 'Running',
+                    }
+                    }
+                )
+
                 break
 
         contain = DOCKER_CLIENT.containers.run("ap0llo/nmap:7.80", [uid], remove=True, detach=True,

@@ -38,6 +38,7 @@ docker pull ap0llo/nmap:7.80
 docker pull ap0llo/dirsearch:0.3.9
 docker pull ap0llo/poc:xunfeng
 docker pull ap0llo/poc:kunpeng
+docker pull ap0llo/poc:bugscan
 docker pull mongo:4.1
 
 # 运行数据库
@@ -48,6 +49,9 @@ docker run --rm --network="host" ap0llo/poc:xunfeng init
 
 # 初始化kunpeng镜像
 docker run --rm --network="host" ap0llo/poc:kunpeng init
+
+# 初始化bugscan镜像
+docker run --rm --network="host" ap0llo/poc:bugscan init
 
 # 结束
 echo "OK"
