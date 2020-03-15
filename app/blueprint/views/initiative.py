@@ -101,7 +101,7 @@ def initiative_controller():
                 data = {"status": 403, "msg": "请指定项目名称"}
                 return jsonify(data)
 
-            if mongo.db.tasks.find_one({'hack_type': '主动扫描', 'status': "Running"}) != None:
+            if mongo.db.tasks.find_one({'hack_type': '主动扫描', 'status': "Running"}) is not None:
                 data = {"status": 403, "msg": "任务正在运行，请稍后添加"}
                 return jsonify(data)
 
@@ -138,7 +138,7 @@ def initiative_controller():
                 data = {"status": 200, "msg": "项目添加成功"}
                 return jsonify(data)
 
-            if child_task_name != None:
+            if child_task_name is not None:
                 # 从项目选择的方案
                 task_id_new = get_uuid()
                 task = {"id": task_id_new, "create_date": datetime.datetime.now(), "parent_name": project,
@@ -159,7 +159,7 @@ def initiative_controller():
         if action == "delete":
 
             task = mongo.db.tasks.find_one({'id': task_id})
-            if task == None:
+            if task is None:
                 data = {"status": 200, "msg": "项目删除成功"}
                 return jsonify(data)
 
@@ -183,7 +183,7 @@ def initiative_controller():
                 result = {"status": 403, "msg": "任务还没有完成"}
                 return jsonify(result, safe=False)
 
-            if mongo.db.exports.find_one({"pid": task_id}) != None:
+            if mongo.db.exports.find_one({"pid": task_id}) is not None:
                 result = {"status": 403, "msg": "任务已存在，请前往导出页面查看"}
                 return jsonify(result)
 

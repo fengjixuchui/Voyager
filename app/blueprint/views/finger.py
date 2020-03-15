@@ -119,7 +119,7 @@ def finger_controller():
                         url = i
                         _url = urlparse(url)
                         hostname = _url.hostname
-                        port = _url.port if _url.port != None else 80
+                        port = _url.port if _url.port is not None else 80
 
                         port_dict = {"id": task_id, "address": hostname, "mac": "Null", "vendor": "Null", "port": port,
                                      "hostname": "Null", "create_date": datetime.datetime.now(),
@@ -145,7 +145,7 @@ def finger_controller():
                 data = {"status": 200, "msg": "项目添加成功"}
                 return jsonify(data)
 
-            if child_task_name != None:
+            if child_task_name is not None:
                 # 从项目选择的方案
                 task_id_new = get_uuid()
                 task = {"id": task_id_new, "create_date": datetime.datetime.now(), "parent_name": project,
@@ -165,7 +165,7 @@ def finger_controller():
         if action == "delete":
 
             task = mongo.db.tasks.find_one({'id': task_id})
-            if task == None:
+            if task is None:
                 data = {"status": 200, "msg": "项目删除成功"}
                 return jsonify(data)
 

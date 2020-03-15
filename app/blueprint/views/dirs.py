@@ -92,6 +92,10 @@ def dirs_controller():
 
         if action == "add":
 
+            # if mongo.db.tasks.find({'status': "Running", "hack_type": "目录扫描"}).count() > 0:
+            #     data = {"status": 403, "msg": "现在已有项目正在运行，请稍后添加"}
+            #     return jsonify(data)
+
             if len(ip_address) != 0:
                 # 输入文本的方案
 
@@ -124,7 +128,7 @@ def dirs_controller():
                 data = {"status": 200, "msg": "项目添加成功"}
                 return jsonify(data)
 
-            if child_task_name != None:
+            if child_task_name is not None:
                 task_id_new = get_uuid()
                 task = {"id": task_id_new, "create_date": datetime.datetime.now(), "parent_name": project,
                         "target": "Null", "task_type": "即时任务", "hack_type": "目录扫描", "status": "Running",
@@ -172,7 +176,7 @@ def dirs_controller():
                 result = {"status": 403, "msg": "没有结果"}
                 return jsonify(result)
 
-            if mongo.db.exports.find_one({"pid": task_id}) != None:
+            if mongo.db.exports.find_one({"pid": task_id}) is not None:
                 result = {"status": 403, "msg": "任务已存在，请前往导出页面查看"}
                 return jsonify(result)
 

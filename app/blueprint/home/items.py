@@ -63,7 +63,7 @@ def items_controllers():
         if action == "add":
             item = mongo.db.items.find_one({'project': item_name})
 
-            if item != None:
+            if item is not None:
                 data = {"status": 403, "msg": "项目已存在"}
                 return jsonify(data)
 

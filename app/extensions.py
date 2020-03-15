@@ -3,4 +3,3 @@ from flask_wtf.csrf import CSRFProtect
 
 mongo = PyMongo()
 csrf = CSRFProtect()
-

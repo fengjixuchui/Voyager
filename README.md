@@ -1,4 +1,6 @@
 # 旅行者探测器系统
+
+**项目正在快速迭代中，请即时更新源代码 https://github.com/ody5sey/Voyager/**
 ![旅行者2号](img/Voyager.jpg)
 
 ##  0x01 功能介绍
@@ -32,7 +34,6 @@ Web框架: **Flask(1.1.1)**
 ### 0x001 域名扫描
 采用的是[oneforall](https://github.com/shmilylty/OneForAll)，当前使用的版本是0.0.9,我修改了部分代码，使得工具和平台能够结合
 
-**关于单个任务进度条的提示:ap0llo/oneforall:0.0.8还是存在单个任务进度统计的，但是ap0llo/oneforall:0.0.9由于oneforall代码结构的变化，无法将爆破任务的进度数据分离出来，所以无法统计，在200M宽带下，单个域名扫描任务需要时间最长六分钟，从0.00%直接跳到100.00%**
 
 ![](img/img5.png)
 
@@ -58,6 +59,9 @@ Web框架: **Flask(1.1.1)**
 分析了一下sqlmap的源代码，从中提取出了sqlmap用于WAF探测的代码并进行了封装, 用来探测类http端口是否有WAF保护，此功能并未在前台展示，一些模块比如目录扫描会自动进行调用
 
 ### 0x007 主动扫描
+
+**此功能暂时处于冻结状态,我正在测试AWVS13的API**
+
 主动扫描用的是AWVS12，已经封装在Docker里了，通过AWVS12的restful进行API调用
 
 ## 0x03 安装教程
@@ -67,13 +71,31 @@ Web框架: **Flask(1.1.1)**
 
 
 ### 0x001 下载源码安装
-我把步骤都写在run.sh里了，理论上run.sh适应与Debian系操作系统(包括Debian, Kali, Ubuntu)
+
+我把步骤都写在run.sh里了，理论上run.sh适应于Debian系操作系统(包括Debian, Kali, Ubuntu)
 
 ```bash
 git clone https://github.com/ody5sey/Voyager.git
 cd Voyager
 bash run.sh
 ```
+
+国内用户建议运行debian_run.sh，会使用国内源进行安装
+
+```bash
+git clone https://github.com/ody5sey/Voyager.git
+cd Voyager
+bash debian_run.sh
+```
+
+红帽系操作系统(包括redhat, fedora, centos)请用redhat_run.sh
+
+```bash
+git clone https://github.com/ody5sey/Voyager.git
+cd Voyager
+bash redhat_run.sh
+```
+
 
 ### 0x002 运行
 
@@ -83,11 +105,16 @@ pipenv shell
 python manager.py
 ```
 
-添加新用户
-curl http://127.0.0.1:5000/add
-然后访问 http://127.0.0.1:5000/
+运行后没有默认用户
+
+请访问http://127.0.0.1:5000/add 以添加新用户
+
+或使用 curl http://127.0.0.1:5000/add
+
+然后访问 http://127.0.0.1:5000/ 登录即可
 
 默认的用户名和密码是luffy:s1riu5
+
 
 ![展示](img/img4.png)
 
@@ -121,3 +148,28 @@ curl http://127.0.0.1:5000/add
 - [ ] 各组件的协调优化以及BUG修复, 漏报，误报的修复
 - [ ] 指纹库的更新和poc库的更新
 
+### 0x06 Q&A
+
+一. 为什么域名扫描添加任务之后长时间不动
+
+关于单个任务进度条的说明:ap0llo/oneforall:0.0.8采用的是oneforall:0.0.8版本。还是存在单个任务进度统计的，但是ap0llo/oneforall:0.0.9由于oneforall代码结构的变化，无法将爆破任务的进度数据分离出来，所以无法统计，在200M宽带下，单个域名扫描任务需要时间最长六分钟，从0.00%直接跳到100.00%
+
+
+二. 为什么漏洞扫描无法添加数据
+
+漏洞扫描采用的是POC扫描，要想扫描端口或者是网站必须有标签，比如21端口是"ftp", 22端口是"ssh",poc要根据这些标签才能扫描，这也意味着POC扫描必须在端口扫描和指纹识别之后，当有端口扫描或者是指纹识别的任务完成之后就能在漏洞扫描下面看到任务列表了
+
+
+三. 为什么扫描这么慢
+
+扫描速度受限与网速和系统本身的硬件性能，不建议在虚拟机(vmware,virtualbox, pd)上跑,虚拟网卡有性能损失
+
+
+四. 为什么端口扫描很慢
+
+在这个框架下，性能测试的极限是百兆内网全C段，全端口扫描需要时间是10分钟，但是考虑到个人的宽带和家用路由性能，全速扫描的话，路由器分分钟瘫痪，所以我将性能进行了大幅压缩，所以端口扫描的时间变长了
+
+
+五. 为什么漏洞扫描没有扫描到漏洞
+
+现在漏洞扫描用的144个POC，来自于xunfeng和kunpeng，这两个框架检测不到扫描器也检测不到，我正在测试其他的POC框架

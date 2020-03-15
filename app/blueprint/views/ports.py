@@ -101,7 +101,7 @@ def ports_controllers():
         option = request.form.get('option', None)  # full each
 
         if action == "add":
-            if ports == None or action == None:
+            if ports is None or action is None:
                 result = {"status": 403, "msg": "值不能为空"}
                 return jsonify(result)
 
@@ -109,7 +109,7 @@ def ports_controllers():
                 result = {"status": 403, "msg": "项目已存在"}
                 return jsonify(result)
 
-            if target_id == None and len(ip_address) > 0:
+            if target_id is None and len(ip_address) > 0:
                 port = ",".join(ports.split("\n"))
                 # target = str([",".join(ip_address.split("\n")), port])
                 # target = str([",".join([i for i in ip_address.split("\n") if len(i) > 0]), port])
@@ -140,7 +140,7 @@ def ports_controllers():
                 result = {"status": 200, "msg": "任务创建成功"}
                 return jsonify(result)
 
-            if target_id != None and len(ip_address) == 0:
+            if target_id is not None and len(ip_address) == 0:
 
                 task_subdomain = mongo.db.subdomains.find({"pid": target_id})
 
@@ -240,7 +240,7 @@ def ports_controllers():
 
             task = mongo.db.tasks.find_one({'id': task_id})
 
-            if task == None:
+            if task is None:
                 mongo.db.tasks.delete_one({'id': task_id})
                 mongo.db.ports.delete_many({'pid': task_id})
                 mongo.db.exports.delete_one({'id': task_id})
@@ -292,7 +292,7 @@ def ports_controllers():
 
                 new_target.append(new_dict)
 
-            if mongo.db.exports.find_one({"pid": task_id}) != None:
+            if mongo.db.exports.find_one({"pid": task_id}) is not None:
                 result = {"status": 403, "msg": "任务已存在，请前往导出页面查看"}
                 return jsonify(result)
 

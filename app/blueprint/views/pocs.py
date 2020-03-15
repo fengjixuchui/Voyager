@@ -35,7 +35,6 @@ def pocs():
         limit_start = (p - 1) * 20
         coll = mongo.db.tasks
         result = coll.find({"hack_type": "POC扫描"}).sort([("create_date", -1)]).limit(20).skip(limit_start)
-
         '''总页数'''
         total = coll.find({}).count()
         page_total = int(math.ceil(total / 20))
@@ -99,7 +98,7 @@ def pocs_controllers():
         task_id = request.form.get("task_id", None)
 
         if action == "add":
-            if project == None or action == None or target_name == None:
+            if project is None or action is None or target_name is None:
                 result = {"status": 403, "msg": "值不能为空"}
                 return jsonify(result)
 
@@ -120,7 +119,7 @@ def pocs_controllers():
 
             task = mongo.db.tasks.find_one({'id': task_id})
 
-            if task == None:
+            if task is None:
                 result = {"status": 403, "msg": "任务不存在"}
                 return jsonify(result)
 
@@ -158,7 +157,7 @@ def pocs_controllers():
                 result = {"status": 403, "msg": "没有漏洞"}
                 return jsonify(result)
 
-            if mongo.db.exports.find_one({"pid": task_id}) != None:
+            if mongo.db.exports.find_one({"pid": task_id}) is None:
                 result = {"status": 403, "msg": "任务已存在，请前往导出页面查看"}
                 return jsonify(result)
 

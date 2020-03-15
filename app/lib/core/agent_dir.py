@@ -23,7 +23,7 @@ class ControllerDirs():
     # 存放目标线程数
     target_queue = queue.Queue()
 
-    list_queue = queue.Queue()
+    # list_queue = queue.Queue()
 
     def __init__(self, method, task_name, project, pid):
 
@@ -35,6 +35,8 @@ class ControllerDirs():
 
     # waf检查函数
     def _waf_check(self):
+
+        list_queue = queue.Queue()
 
         if self.method == "adam":
 
@@ -79,7 +81,7 @@ class ControllerDirs():
                     for index in range(0, THREADS):
                         # self.threads_queue.get()
                         param = self.target_queue.get()
-                        attacker = threading.Thread(target=waf_check, args=(param, self.list_queue))
+                        attacker = threading.Thread(target=waf_check, args=(param, list_queue))
                         attacker.start()
                         target_list.append(attacker)
 
@@ -88,7 +90,7 @@ class ControllerDirs():
                     for index in range(0, self.target_queue.qsize()):
                         # self.threads_queue.get()
                         param = self.target_queue.get()
-                        attacker = threading.Thread(target=waf_check, args=(param, self.list_queue))
+                        attacker = threading.Thread(target=waf_check, args=(param, list_queue))
                         attacker.start()
                         target_list.append(attacker)
 
@@ -101,7 +103,7 @@ class ControllerDirs():
                             alive = True
                             time.sleep(0.1)
 
-            return list(self.list_queue.queue)
+            return list(list_queue.queue)
 
         if self.method == "lilith":
 
@@ -115,7 +117,7 @@ class ControllerDirs():
 
             target_content = sess["target"]
 
-            for k in ast.literal_eval(target_content):
+            for k in json.loads(target_content):
                 self.target_queue.put_nowait(k)
 
             while True:
@@ -129,7 +131,7 @@ class ControllerDirs():
                     for index in range(0, THREADS):
                         # self.threads_queue.get()
                         param = self.target_queue.get()
-                        attacker = threading.Thread(target=waf_check, args=(param, self.list_queue))
+                        attacker = threading.Thread(target=waf_check, args=(param, list_queue))
                         attacker.start()
                         target_list.append(attacker)
 
@@ -138,7 +140,7 @@ class ControllerDirs():
                     for index in range(0, self.target_queue.qsize()):
                         # self.threads_queue.get()
                         param = self.target_queue.get()
-                        attacker = threading.Thread(target=waf_check, args=(param, self.list_queue))
+                        attacker = threading.Thread(target=waf_check, args=(param, list_queue))
                         attacker.start()
                         target_list.append(attacker)
 
@@ -150,7 +152,7 @@ class ControllerDirs():
                             alive = True
                             time.sleep(0.1)
 
-            return list(self.list_queue.queue)
+            return list(list_queue.queue)
 
     def dir_scan(self, info):
 
@@ -248,9 +250,34 @@ class ControllerDirs():
     @classmethod
     @threaded
     def thread_start(cls, method, task_name, project, pid):
+
+        while True:
+            if mongo.db.tasks.find({'status': "Running", "hack_type": "目录扫描"}).count() > 0:
+                mongo.db.tasks.update_one(
+                    {"id": pid},
+                    {'$set': {
+                        'status': 'Wait',
+                    }
+                    }
+                )
+                time.sleep(5)
+
+            else:
+
+                mongo.db.tasks.update_one(
+                    {"id": pid},
+                    {'$set': {
+                        'status': 'Running',
+                    }
+                    }
+                )
+
+                break
+
         app = cls(method=method, task_name=task_name, project=project, pid=pid)
         # 类http标签进行waf检查
         info = app._waf_check()
+
         if info == "flag":
             mongo.db.tasks.update_one(
                 {"id": pid},
