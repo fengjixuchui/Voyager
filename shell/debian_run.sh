@@ -9,7 +9,7 @@ fi
 # 安装docker-ce和依赖
 curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/debian/gpg | apt-key add -
 echo 'deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/debian buster stable' > /etc/apt/sources.list.d/docker.list
-apt update && apt install docker-ce -y && apt install build-essential libbz2-dev libssl-dev libreadline-dev libsqlite3-dev -y
+apt update && apt install docker-ce -y && apt install build-essential libffi-dev libbz2-dev libssl-dev libreadline-dev libsqlite3-dev -y
 
 # 更换为中科大仓库镜像
 echo '{"registry-mirrors": ["https://docker.mirrors.ustc.edu.cn/"]}' > /etc/docker/daemon.json

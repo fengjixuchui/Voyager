@@ -3,7 +3,7 @@
 # 安装docker和依赖
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 echo 'deb [arch=amd64] https://download.docker.com/linux/debian buster stable' > /etc/apt/sources.list.d/docker.list
-apt update && apt install docker-ce -y && apt install build-essential libbz2-dev libssl-dev libreadline-dev libsqlite3-dev -y
+apt update && apt install docker-ce -y && apt install build-essential libffi-dev libbz2-dev libssl-dev libreadline-dev libsqlite3-dev -y
 systemctl enable docker
 systemctl start docker
 
