@@ -56,7 +56,6 @@ docker run --rm --network="host" ap0llo/poc:kunpeng init
 # 初始化bugscan镜像
 docker run --rm --network="host" ap0llo/poc:bugscan init
 
-
 # 结束
 echo "OK"
 

@@ -14,7 +14,7 @@ import json
 THREADS = 10
 
 
-class ControllerPocs():
+class ControllerPocs(object):
     # 控制并发线程数
     threads_queue = queue.Queue(maxsize=THREADS)
     for i in range(THREADS):
@@ -56,7 +56,7 @@ class ControllerPocs():
                 for index in range(0, THREADS):
                     self.threads_queue.get()
                     param = self.target_queue.get()
-                    attacker = threading.Thread(target=waf_check, args=(param, self.list_queue))
+                    attacker = threading.Thread(target=waf_check, args=(param, list_queue))
                     attacker.start()
                     target_list.append(attacker)
 
@@ -175,21 +175,65 @@ class ControllerPocs():
 
                     """
 
-                    if m["vul_service"] in n["service"]:
+                    if m.get("vul_service") in n.get("service"):
 
-                        attack_dict = {'netloc': n["http_address"], "poc": m["poc_name"], "keyword": n["service"],
-                                       "parent_name": self.project}
-                        if attack_dict not in attack_list_bugscan:
-                            attack_list_bugscan.append(attack_dict)
+                        if n.get("service") in ["http", "ssl", "https"]:
+                            if 'http' in n.get("service"):
+                                scheme = 'http'
+                                if n.get("service") in ['https', 'ssl'] or n.get("port") == 443:
+                                    scheme = 'https'
+                                target_url = '{}://{}:{}'.format(scheme, n["address"], n["port"])
 
-                    if m["vul_service"] in n["category"]:
+                                attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
+                                               "parent_name": self.project}
+                                if attack_dict not in attack_list_bugscan:
+                                    attack_list_bugscan.append(attack_dict)
 
-                        attack_dict = {'netloc': n["http_address"], "poc": m["poc_name"], "keyword": n["category"],
-                                       "parent_name": self.project}
-                        if attack_dict not in attack_list_bugscan:
-                            attack_list_bugscan.append(attack_dict)
+                        else:
+                            target_url = '{}:{}'.format(n["address"], n["port"])
 
-        poc_num = attack_list_xunfeng + attack_list_kunpeng
+                            attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
+                                           "parent_name": self.project}
+                            if attack_dict not in attack_list_bugscan:
+                                attack_list_bugscan.append(attack_dict)
+
+                    if m.get("vul_service") in n.get("category"):
+
+                        if n.get("category") in ["http", "ssl", "https"]:
+                            if 'http' in n.get("category"):
+                                scheme = 'http'
+                                if n.get("category") in ['https', 'ssl'] or n.get("port") == 443:
+                                    scheme = 'https'
+                                target_url = '{}://{}:{}'.format(scheme, n["address"], n["port"])
+
+                                attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
+                                               "parent_name": self.project}
+                                if attack_dict not in attack_list_bugscan:
+                                    attack_list_bugscan.append(attack_dict)
+
+                        else:
+                            target_url = '{}:{}'.format(n["address"], n["port"])
+
+                            attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
+                                           "parent_name": self.project}
+                            if attack_dict not in attack_list_bugscan:
+                                attack_list_bugscan.append(attack_dict)
+
+                    # if m["vul_service"] in n["service"]:
+                    #
+                    #     attack_dict = {'netloc': n["http_address"], "poc": m["poc_name"], "keyword": n["service"],
+                    #                    "parent_name": self.project}
+                    #     if attack_dict not in attack_list_bugscan:
+                    #         attack_list_bugscan.append(attack_dict)
+                    #
+                    # if m["vul_service"] in n["category"]:
+                    #
+                    #     attack_dict = {'netloc': n["http_address"], "poc": m["poc_name"], "keyword": n["category"],
+                    #                    "parent_name": self.project}
+                    #     if attack_dict not in attack_list_bugscan:
+                    #         attack_list_bugscan.append(attack_dict)
+
+        poc_num = attack_list_xunfeng + attack_list_kunpeng + attack_list_bugscan
 
         sess = mongo.db.tasks.find_one({"id": self.pid})
 

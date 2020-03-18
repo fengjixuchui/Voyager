@@ -72,20 +72,27 @@ Web框架: **Flask(1.1.1)**
 
 ### 0x001 下载源码安装
 
-我把步骤都写在run.sh里了，理论上run.sh适应于Debian系操作系统(包括Debian, Kali, Ubuntu)
+我把步骤都写在shell/run.sh里了
 
 ```bash
 git clone https://github.com/ody5sey/Voyager.git
 cd Voyager
-bash run.sh
+bash shell/run.sh
 ```
 
-国内用户建议运行debian_run.sh，会使用国内源进行安装
+国内用户(Debian, Ubuntu)建议运行debian_run.sh，会使用国内源进行安装
 
 ```bash
 git clone https://github.com/ody5sey/Voyager.git
 cd Voyager
-bash debian_run.sh
+bash shell/debian_run.sh
+```
+
+Kali用户使用shell/kali_run.sh
+```bash
+git clone https://github.com/ody5sey/Voyager.git
+cd Voyager
+bash shell/kali_run.sh
 ```
 
 红帽系操作系统(包括redhat, fedora, centos)请用redhat_run.sh
@@ -93,7 +100,7 @@ bash debian_run.sh
 ```bash
 git clone https://github.com/ody5sey/Voyager.git
 cd Voyager
-bash redhat_run.sh
+bash shell/redhat_run.sh
 ```
 
 
@@ -173,3 +180,6 @@ python manager.py
 五. 为什么漏洞扫描没有扫描到漏洞
 
 现在漏洞扫描用的144个POC，来自于xunfeng和kunpeng，这两个框架检测不到扫描器也检测不到，我正在测试其他的POC框架
+
+### 0x07 微信讨论群
+![wei](img/weixin.jpg)
