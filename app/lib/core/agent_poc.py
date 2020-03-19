@@ -99,6 +99,11 @@ class ControllerPocs(object):
         for i in pocs:
             pocs_list.append(i)
 
+        info1 = json.dumps(pocs_list, ensure_ascii=False)
+        info2 = json.dumps(target_list, ensure_ascii=False)
+        print(f"m = {info1}")
+        print(f"n = {info2}")
+
         for m in pocs_list:
             for n in target_list:
 
@@ -175,52 +180,53 @@ class ControllerPocs(object):
 
                     """
 
-                    print(f"m={m}", "poc")
-                    print(f"m={n}", "port")
+                    if m.get("vul_service", "") is not None and n.get("service", "") is not None:
 
-                    if m.get("vul_service") in n.get("service"):
+                        if m.get("vul_service", "") in n.get("service", ""):
 
-                        if n.get("service") in ["http", "ssl", "https"]:
-                            if 'http' in n.get("service"):
-                                scheme = 'http'
-                                if n.get("service") in ['https', 'ssl'] or n.get("port") == 443:
-                                    scheme = 'https'
-                                target_url = '{}://{}:{}'.format(scheme, n["address"], n["port"])
+                            if n.get("service", "") in ["http", "ssl", "https"]:
+                                if 'http' in n.get("service"):
+                                    scheme = 'http'
+                                    if n.get("service") in ['https', 'ssl'] or n.get("port") == 443:
+                                        scheme = 'https'
+                                    target_url = '{}://{}:{}'.format(scheme, n["address"], n["port"])
 
-                                attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
-                                               "parent_name": self.project}
-                                if attack_dict not in attack_list_bugscan:
-                                    attack_list_bugscan.append(attack_dict)
+                                    attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
+                                                   "parent_name": self.project}
+                                    if attack_dict not in attack_list_bugscan:
+                                        attack_list_bugscan.append(attack_dict)
 
-                        else:
-                            target_url = '{}:{}'.format(n["address"], n["port"])
-
-                            attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
-                                           "parent_name": self.project}
-                            if attack_dict not in attack_list_bugscan:
-                                attack_list_bugscan.append(attack_dict)
-
-                    if m.get("vul_service") in n.get("category"):
-
-                        if n.get("category") in ["http", "ssl", "https"]:
-                            if 'http' in n.get("category"):
-                                scheme = 'http'
-                                if n.get("category") in ['https', 'ssl'] or n.get("port") == 443:
-                                    scheme = 'https'
-                                target_url = '{}://{}:{}'.format(scheme, n["address"], n["port"])
+                            else:
+                                target_url = '{}:{}'.format(n["address"], n["port"])
 
                                 attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
                                                "parent_name": self.project}
                                 if attack_dict not in attack_list_bugscan:
                                     attack_list_bugscan.append(attack_dict)
 
-                        else:
-                            target_url = '{}:{}'.format(n["address"], n["port"])
+                    if m.get("vul_service") is not None and n.get("service", "") is not None:
 
-                            attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
-                                           "parent_name": self.project}
-                            if attack_dict not in attack_list_bugscan:
-                                attack_list_bugscan.append(attack_dict)
+                        if m.get("vul_service") in n.get("category"):
+
+                            if n.get("category") in ["http", "ssl", "https"]:
+                                if 'http' in n.get("category"):
+                                    scheme = 'http'
+                                    if n.get("category") in ['https', 'ssl'] or n.get("port") == 443:
+                                        scheme = 'https'
+                                    target_url = '{}://{}:{}'.format(scheme, n["address"], n["port"])
+
+                                    attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
+                                                   "parent_name": self.project}
+                                    if attack_dict not in attack_list_bugscan:
+                                        attack_list_bugscan.append(attack_dict)
+
+                            else:
+                                target_url = '{}:{}'.format(n["address"], n["port"])
+
+                                attack_dict = {'netloc': target_url, "poc": m["poc_name"], "keyword": n["service"],
+                                               "parent_name": self.project}
+                                if attack_dict not in attack_list_bugscan:
+                                    attack_list_bugscan.append(attack_dict)
 
                     # if m["vul_service"] in n["service"]:
                     #
