@@ -99,11 +99,6 @@ class ControllerPocs(object):
         for i in pocs:
             pocs_list.append(i)
 
-        info1 = json.dumps(pocs_list, ensure_ascii=False)
-        info2 = json.dumps(target_list, ensure_ascii=False)
-        print(f"m = {info1}")
-        print(f"n = {info2}")
-
         for m in pocs_list:
             for n in target_list:
 
@@ -204,7 +199,10 @@ class ControllerPocs(object):
                                 if attack_dict not in attack_list_bugscan:
                                     attack_list_bugscan.append(attack_dict)
 
-                    if m.get("vul_service") is not None and n.get("service", "") is not None:
+                    else:
+                        print(m, n, "service")
+
+                    if m.get("vul_service") is not None and n.get("category") is not None:
 
                         if m.get("vul_service") in n.get("category"):
 
@@ -227,6 +225,9 @@ class ControllerPocs(object):
                                                "parent_name": self.project}
                                 if attack_dict not in attack_list_bugscan:
                                     attack_list_bugscan.append(attack_dict)
+
+                    else:
+                        print(m, n, "category")
 
                     # if m["vul_service"] in n["service"]:
                     #

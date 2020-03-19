@@ -202,7 +202,7 @@ def finger_controller():
                 result = {"status": 403, "msg": "没有结果"}
                 return jsonify(result)
 
-            if mongo.db.exports.find_one({"pid": task_id}) != None:
+            if mongo.db.exports.find_one({"pid": task_id}) is not None:
                 result = {"status": 403, "msg": "任务已存在，请前往导出页面查看"}
                 return jsonify(result)
 

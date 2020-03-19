@@ -69,7 +69,7 @@ def pocs_add():
         tasks = mongo.db.tasks.find(
             {'status': "Finished", "$or": [{"hack_type": "端口扫描"}, {"hack_type": "域名扫描"}, {"hack_type": "指纹识别"}]})
         for i in tasks:
-            if i['total_host'] > 0 and i['parent_name'] not in project_all:
+            if int(i['total_host']) > 0 and i['parent_name'] not in project_all:
                 project_all.append(i['parent_name'])
 
         # 如果没有子域名扫描项目
@@ -157,7 +157,7 @@ def pocs_controllers():
                 result = {"status": 403, "msg": "没有漏洞"}
                 return jsonify(result)
 
-            if mongo.db.exports.find_one({"pid": task_id}) is None:
+            if mongo.db.exports.find_one({"pid": task_id}) is not None:
                 result = {"status": 403, "msg": "任务已存在，请前往导出页面查看"}
                 return jsonify(result)
 
