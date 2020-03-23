@@ -20,9 +20,6 @@ from app.blueprint import admin
 from app.blueprint import admin_required
 from app.extensions import mongo
 
-from app.config import THREADS
-from app.config import RATE
-
 
 @admin.route("/port_lists", methods=["GET"])
 @admin_required
@@ -126,7 +123,7 @@ def ports_controllers():
                     return jsonify(result)
 
                 target_dict = {"ips": ",".join([i for i in ip_address.split("\n") if len(i) > 0]), "ports": port,
-                               "rates": RATE, "threads": THREADS}
+                               "rates": 100, "threads": 5}
 
                 target = json.dumps(target_dict, ensure_ascii=False)
 
