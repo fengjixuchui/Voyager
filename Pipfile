@@ -8,9 +8,6 @@ verify_ssl = true
 [packages]
 flask = "*"
 flask-pymongo = "*"
-docker = "*"
 flask-wtf = "*"
 xlsxwriter = "*"
-
-[requires]
-python_version = "3.8.1"
+docker = "*"

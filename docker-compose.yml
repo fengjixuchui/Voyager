@@ -1,0 +1,34 @@
+version: "3"
+services:
+  mongo:
+    image: mongo:4.1
+    restart: always
+    ports:
+      - 127.0.0.1:27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=shad0wBrok3r
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 127.0.0.1:8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=shad0wBrok3r
+
+  xunfeng:
+    image: ap0llo/poc:xunfeng
+    network_mode: "host"
+    command: init
+
+  kunpeng:
+    image: ap0llo/poc:kunpeng
+    network_mode: "host"
+    command: init
+
+  bugscan:
+    image: ap0llo/poc:bugscan
+    network_mode: "host"
+    command: init

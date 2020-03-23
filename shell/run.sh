@@ -13,9 +13,9 @@ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(pyenv init -)"' >> ~/.bashrc
 source ~/.bashrc
-pyenv install 3.8.1
-pyenv global 3.8.1
-pip install pipenv
+pyenv install 3.8.2
+pyenv global 3.8.2
+pip install pipenv docker-compose
 pipenv install
 
 
@@ -28,18 +28,8 @@ docker pull ap0llo/poc:kunpeng
 docker pull ap0llo/poc:bugscan
 docker pull mongo:4.1
 
-# 运行数据库
-docker run --rm -d -p 127.0.0.1:27017:27017 -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=shad0wBrok3r mongo:4.1
-
-
-# 初始化xunfeng镜像
-docker run --rm --network="host" ap0llo/poc:xunfeng init
-
-# 初始化kunpeng镜像
-docker run --rm --network="host" ap0llo/poc:kunpeng init
-
-# 初始化bugscan镜像
-docker run --rm --network="host" ap0llo/poc:bugscan init
+# 运行数据库并初始化poc
+docker-compose up -d
 
 # 结束
 echo "OK"
