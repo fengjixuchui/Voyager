@@ -81,6 +81,10 @@ def domains_controllers():
 
             target_name = ",".join(new_list)
 
+            if "gov.cn" in target_name:
+                result = {"status": 403, "msg": "禁止添加政府网站"}
+                return jsonify(result)
+
             task_id = get_uuid()
 
             task = {"id": task_id, "create_date": datetime.datetime.now(), "parent_name": project,
