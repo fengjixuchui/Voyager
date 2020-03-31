@@ -20,6 +20,9 @@ from app.blueprint import admin
 from app.blueprint import admin_required
 from app.extensions import mongo
 
+RATE = 10000
+THREADS = 5
+
 
 @admin.route("/port_lists", methods=["GET"])
 @admin_required
@@ -123,7 +126,7 @@ def ports_controllers():
                     return jsonify(result)
 
                 target_dict = {"ips": ",".join([i for i in ip_address.split("\n") if len(i) > 0]), "ports": port,
-                               "rates": 100, "threads": 5}
+                               "rates": 10000, "threads": 5}
 
                 target = json.dumps(target_dict, ensure_ascii=False)
 
@@ -267,7 +270,7 @@ def ports_controllers():
         if action == "export":
             if mongo.db.tasks.find_one({'id': task_id})["status"] != "Finished":
                 result = {"status": 403, "msg": "任务还没有完成"}
-                return jsonify(result, safe=False)
+                return jsonify(result)
 
             new_target = []
 

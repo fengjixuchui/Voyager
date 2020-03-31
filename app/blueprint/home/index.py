@@ -20,7 +20,7 @@ def add():
     name = "luffy"
     password = "s1riu5"
 
-    if mongo.db.users.find_one({'name': name}) == None:
+    if mongo.db.users.find_one({'name': name}) is None:
         user = {'name': name, 'age': 18, 'password_hash': generate_password_hash(password=password)}
         mongo.db.users.insert_one(user)
 
@@ -45,7 +45,6 @@ def login():
 
             data = {"status": 200, "url_jump": "/"}
             return jsonify(data)
-
 
         else:
 

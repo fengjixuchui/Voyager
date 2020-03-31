@@ -68,12 +68,12 @@
                                     <td>{{ i.live_host }}</td>
                                     <td>{{ i.total_host }}</td>
                                     <td>{{ i.create_date.strftime("%Y-%m-%d %H:%M:%S") }}</td>
-                                    {% if i.end_time == "Null" %}
-                                        <td>Null</td>
-
-                                    {% else %}
-                                        <td>{{ i.end_time.strftime("%Y-%m-%d %H:%M:%S") }}</td>
-                                    {% endif %}
+                                    {#                                    {% if i.end_time == "Null" %}#}
+                                    {#                                        <td>Null</td>#}
+                                    {#                                    {% else %}#}
+                                    {#                                        <td>{{ i.end_time.strftime("%Y-%m-%d %H:%M:%S") }}</td>#}
+                                    {#                                    {% endif %}#}
+                                    <td>{{ i.end_time }}</td>
 
                                     <td class="td-manage">
                                         <a title="查看" onclick="tasks_export(this,'{{ i.id }}')" href="javascript:;">

@@ -53,7 +53,7 @@ class Controller(object):
             if task is None:
                 return True
 
-            if mongo.db.tasks.find({'status': "Running", "hack_type": "域名扫描"}).count() > 1:
+            if mongo.db.tasks.find({'status': "Running", "hack_type": "域名扫描"}).count() > 0:
                 mongo.db.tasks.update_one(
                     {"id": uid},
                     {'$set': {
@@ -147,7 +147,7 @@ class Controller(object):
             if task is None:
                 return True
 
-            if mongo.db.tasks.find({'status': "Running", "hack_type": "端口扫描"}).count() > 1:
+            if mongo.db.tasks.find({'status': "Running", "hack_type": "端口扫描"}).count() > 0:
                 mongo.db.tasks.update_one(
                     {"id": uid},
                     {'$set': {

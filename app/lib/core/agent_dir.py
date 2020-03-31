@@ -9,7 +9,6 @@ import threading
 import time
 import queue
 import json
-import ast
 
 THREADS = 10
 
@@ -99,7 +98,7 @@ class ControllerDirs():
                 while alive:
                     alive = False
                     for thread in target_list:
-                        if thread.isAlive():
+                        if thread.is_alive():
                             alive = True
                             time.sleep(0.1)
 
@@ -148,7 +147,7 @@ class ControllerDirs():
                 while alive:
                     alive = False
                     for thread in target_list:
-                        if thread.isAlive():
+                        if thread.is_alive():
                             alive = True
                             time.sleep(0.1)
 
@@ -187,65 +186,118 @@ class ControllerDirs():
             }
         )
 
-        contain = DOCKER_CLIENT.containers.run("ap0llo/dirsearch:0.3.9", [self.pid], detach=True,
-                                               network="host", auto_remove=True)
+        for i in info:
+            target = str(json.dumps(i, ensure_ascii=False))
 
-        mongo.db.tasks.update_one(
-            {"id": self.pid},
-            {'$set': {
-                'contain_id': contain.id
+            contain = DOCKER_CLIENT.containers.run("ap0llo/dirsearch:0.3.9", [target], detach=True,
+                                                   network="host")
 
-            }
-            }
-        )
+            mongo.db.tasks.update_one(
+                {"id": self.pid},
+                {'$set': {
+                    'contain_id': contain.id
 
-        # 心跳线程用来更新任务状态
-        while True:
+                }
+                }
+            )
 
-            task_dir = mongo.db.tasks.find_one({"id": self.pid})
-            if task_dir is None:
-                return "flag"
+            # 心跳线程用来更新任务状态
+            while True:
 
-            process_json = ast.literal_eval(task_dir["total_host"])
+                time.sleep(3)
 
-            if len(process_json) == 0:
-                time.sleep(10)
+                task_dir = mongo.db.tasks.find_one({"id": self.pid})
+                if task_dir is None:
+                    return
 
-            tasks_num = task_dir["hidden_host"]
+                process_json = json.loads(task_dir["total_host"])
 
-            now_progress = 0
-            # 统计总任务进度
-            for k, v in process_json.items():
-                progress_ = formatnum(v)
-                now_progress = now_progress + progress_
+                if len(process_json) == 0:
+                    time.sleep(10)
 
-            progress = '{0:.2f}%'.format(now_progress / tasks_num)
+                tasks_num = task_dir["hidden_host"]
 
-            if progress == "100.00%":
-                mongo.db.tasks.update_one(
-                    {"id": self.pid},
-                    {'$set': {
-                        'progress': "100.00%",
-                        'status': 'Finished',
-                        'end_time': datetime.datetime.now(),
-                        'live_host': mongo.db.dir_vuls.find({'pid': self.pid}).count(),
+                now_progress = 0
+                # 统计总任务进度
+                for k, v in process_json.items():
+                    progress_ = formatnum(v)
+                    now_progress = now_progress + progress_
 
-                    }
-                    }
-                )
-                return True
+                progress = '{0:.2f}%'.format(now_progress / tasks_num)
 
-            else:
-                mongo.db.tasks.update_one(
-                    {"id": self.pid},
-                    {'$set': {
-                        'progress': progress
+                if progress == "100.00%":
+                    mongo.db.tasks.update_one(
+                        {"id": self.pid},
+                        {'$set': {
+                            'progress': "100.00%",
+                            'status': "Finished",
+                            "end_time": datetime.datetime.now()
+                        }
+                        }
+                    )
+                    return
 
-                    }
-                    }
-                )
+                if DOCKER_CLIENT.containers.get(contain.id).status == "running":
+                    mongo.db.tasks.update_one(
+                        {"id": self.pid},
+                        {'$set': {
+                            'progress': progress,
 
-            time.sleep(3)
+                        }
+                        }
+                    )
+
+                else:
+
+                    task_collection = mongo.db.tasks.find_one({"id": self.pid})
+
+                    # 如果任务不存在了，直接结束任务。
+                    if task_collection is None:
+                        return True
+
+                    json_target = json.loads(task_collection.get("total_host", "{}"))
+
+                    json_target[i.get("http_address")] = "100.00%"
+
+                    mongo.db.tasks.update_one(
+                        {"id": self.pid},
+                        {'$set': {
+                            'total_host': json.dumps(json_target, ensure_ascii=False),
+
+                        }
+                        }
+                    )
+
+                    # 用来判断任务没有开始就结束的逻辑
+                    new_task_dir = mongo.db.tasks.find_one({"id": self.pid})
+                    if task_dir is None:
+                        return
+
+                    tasks_num = new_task_dir["hidden_host"]
+
+                    json_process = json.loads(new_task_dir["total_host"])
+
+                    now_progress = 0
+                    # 统计总任务进度
+                    for k, v in json_process.items():
+                        progress_ = formatnum(v)
+                        now_progress = now_progress + progress_
+
+                    progress = '{0:.2f}%'.format(now_progress / tasks_num)
+
+                    if progress == "100.00%":
+                        mongo.db.tasks.update_one(
+                            {"id": self.pid},
+                            {'$set': {
+                                'progress': "100.00%",
+                                'status': "Finished",
+                                "end_time": datetime.datetime.now()
+                            }
+                            }
+                        )
+                        return
+
+                    break
 
     @classmethod
     @threaded
@@ -258,7 +310,7 @@ class ControllerDirs():
             if task is None:
                 return True
 
-            if mongo.db.tasks.find({'status': "Running", "hack_type": "目录扫描"}).count() > 1:
+            if mongo.db.tasks.find({'status': "Running", "hack_type": "目录扫描"}).count() > 0:
                 mongo.db.tasks.update_one(
                     {"id": pid},
                     {'$set': {

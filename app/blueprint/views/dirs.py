@@ -103,7 +103,7 @@ def dirs_controller():
                 pid = get_uuid()
                 target_list = list()
 
-                for i in ip_address.split('\n'):
+                for i in set(ip_address.split('\n')):
 
                     if len(i) > 0:
                         new_dict = dict()
