@@ -5,7 +5,7 @@ from app import mongo
 
 import time
 import datetime
-import ast
+import json
 
 
 class Controller(object):
@@ -48,6 +48,8 @@ class Controller(object):
         # 有任务在执行的时候先暂停
         while True:
 
+            time.sleep(3)
+
             task = mongo.db.tasks.find_one({'id': uid})
 
             if task is None:
@@ -75,59 +77,98 @@ class Controller(object):
 
                 break
 
-        contain = DOCKER_CLIENT.containers.run("ap0llo/oneforall:0.0.9", [uid], remove=True, detach=True,
-                                               auto_remove=True,
-                                               network="host")
+        taskCollection = mongo.db.tasks.find_one({"id": uid})
+        if taskCollection is None:
+            return True
 
-        mongo.db.tasks.update_one({"id": uid}, {"$set": {"contain_id": contain.id}})
+        targetList = taskCollection["target"].split(",")
+        parentName = taskCollection["parent_name"]
+        tasks_num = taskCollection["live_host"]
 
-        # 心跳线程用来更新任务状态
-        while True:
+        for t in targetList:
+            newTarget = dict()
+            newTarget["Purpose"] = t
+            newTarget["parentName"] = parentName
+            newTarget["pid"] = uid
 
-            task_dir = mongo.db.tasks.find_one({"id": uid})
-            if task_dir is None:
-                return True
+            infoString = str(json.dumps(newTarget, ensure_ascii=False))
 
-            process_json = ast.literal_eval(task_dir["hidden_host"])
+            contain = DOCKER_CLIENT.containers.run("ap0llo/oneforall:0.1.0", [infoString], detach=True, remove=True,
+                                                   auto_remove=True,
+                                                   network="host")
 
-            if len(process_json) == 0:
-                time.sleep(10)
+            newTaskCollection = mongo.db.tasks.find_one({"id": uid})
+            json_target = json.loads(newTaskCollection.get("hidden_host"))
 
-            tasks_num = task_dir["live_host"]
+            json_target[t] = "0.00%"
 
-            now_progress = 0
-            # 统计总任务进度
-            for k, v in process_json.items():
-                progress_ = formatnum(v)
-                now_progress = now_progress + progress_
+            mongo.db.tasks.update_one({"id": uid}, {
+                "$set": {"contain_id": contain.id, 'hidden_host': json.dumps(json_target, ensure_ascii=False)}})
 
-            progress = '{0:.2f}%'.format(now_progress / tasks_num)
+            # 心跳线程用来更新任务状态
+            while True:
 
-            if progress == "100.00%":
-                mongo.db.tasks.update_one(
-                    {"id": uid},
-                    {'$set': {
-                        'progress': "100.00%",
-                        'status': 'Finished',
-                        'end_time': datetime.datetime.now(),
-                        'total_host': mongo.db.subdomains.find({'pid': uid}).count(),
+                time.sleep(3)
 
-                    }
-                    }
-                )
-                return True
+                task_dir = mongo.db.tasks.find_one({"id": uid})
+                if task_dir is None:
+                    return True
 
-            else:
-                mongo.db.tasks.update_one(
-                    {"id": uid},
-                    {'$set': {
-                        'progress': progress
+                process_json = json.loads(task_dir.get("hidden_host"))
 
-                    }
-                    }
-                )
+                if len(process_json) == 0:
+                    time.sleep(10)
 
-            time.sleep(3)
+                now_progress = 0
+                # 统计总任务进度
+                for k, v in process_json.items():
+                    progress_ = formatnum(v)
+                    now_progress = now_progress + progress_
+
+                progress = '{0:.2f}%'.format(now_progress / tasks_num)
+
+                if progress == "100.00%":
+                    mongo.db.tasks.update_one(
+                        {"id": uid},
+                        {'$set': {
+                            'progress': "100.00%",
+                            'status': "Finished",
+                            "end_time": datetime.datetime.now()
+                        }
+                        }
+                    )
+                    return
+
+                else:
+                    mongo.db.tasks.update_one(
+                        {"id": uid},
+                        {'$set': {
+                            'progress': progress,
+                        }
+                        }
+                    )
+
+                task_collection = mongo.db.tasks.find_one({"id": uid})
+
+                # 如果任务不存在了，直接结束任务。
+                if task_collection is None:
+                    return True
+
+                json_target = json.loads(task_collection.get("hidden_host"))
+
+                if json_target[t] == "100.00%":
+                    break
+
+        mongo.db.tasks.update_one(
+            {"id": uid},
+            {'$set': {
+                'progress': "100.00%",
+                'status': "Finished",
+                "end_time": datetime.datetime.now(),
+                "contain_id": "Null",
+            }
+            }
+        )
 
     @staticmethod
     @threaded

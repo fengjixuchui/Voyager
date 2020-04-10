@@ -60,7 +60,6 @@ class ControllerPocs(object):
                     attacker.start()
                     target_list.append(attacker)
 
-
             else:
                 for index in range(0, self.target_queue.qsize()):
                     self.threads_queue.get()
@@ -152,20 +151,6 @@ class ControllerPocs(object):
 
                             if attack_dict not in attack_list_kunpeng:
                                 attack_list_kunpeng.append(attack_dict)
-                        #
-                        # if n["service"] in ["http", "ssl", "https"]:
-                        #     attack_dict = {'type': 'web', 'target': "web", 'netloc': n["http_address"],
-                        #                    "parent_name": self.project}
-                        #     if attack_dict not in attack_list_kunpeng:
-                        #         attack_list_kunpeng.append(attack_dict)
-                        #
-                        # else:
-                        #
-                        #     attack_dict = {'type': 'service', 'target': n["service"],
-                        #                    'netloc': n["http_address"], "parent_name": self.project}
-                        #
-                        #     if attack_dict not in attack_list_kunpeng:
-                        #         attack_list_kunpeng.append(attack_dict)
 
                 elif m["flag"] == "bugscan":
 
@@ -244,6 +229,8 @@ class ControllerPocs(object):
                     #         attack_list_bugscan.append(attack_dict)
 
         poc_num = attack_list_xunfeng + attack_list_kunpeng + attack_list_bugscan
+
+        print(poc_num)
 
         sess = mongo.db.tasks.find_one({"id": self.pid})
 

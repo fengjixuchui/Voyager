@@ -39,7 +39,7 @@ pip3 install pipenv
 pipenv install
 
 # 下载所需的镜像
-docker pull ap0llo/oneforall:0.0.9
+docker pull ap0llo/oneforall:0.1.0
 docker pull ap0llo/nmap:7.80
 docker pull ap0llo/dirsearch:0.3.9
 docker pull ap0llo/poc:xunfeng

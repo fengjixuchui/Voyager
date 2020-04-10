@@ -211,7 +211,7 @@ def ports_controllers():
                         new_c_list.append(c_ip)
 
                     new_target_ip = list_duplicate(new_c_list)
-                    target = [','.join(new_target_ip), ",".join(port)]
+                    targetIps = [','.join(new_target_ip), ",".join(port)]
 
                     port = ports.split("\n")
                     len_ip = get_ip_list(new_target_ip)
@@ -224,6 +224,11 @@ def ports_controllers():
                         result = {"status": 403, "msg": "端口地址格式错误"}
                         return jsonify(result)
 
+                    target_dict = {"ips": targetIps, "ports": ",".join(port),
+                                   "rates": RATE, "threads": THREADS}
+
+                    target = json.dumps(target_dict, ensure_ascii=False)
+
                     uid = get_uuid()
                     task = {"id": uid, "create_date": datetime.datetime.now(), "parent_name": project,
                             "target": target, "task_type": "即时任务", "hack_type": "端口扫描", "status": "Running",
@@ -232,7 +237,7 @@ def ports_controllers():
 
                     mongo.db.tasks.insert_one(task)
 
-                    Controller.ports_scan(uid, port)
+                    Controller.ports_scan(uid)
 
                     result = {"status": 200, "msg": "任务创建成功"}
                     return jsonify(result)
