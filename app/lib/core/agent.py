@@ -175,7 +175,6 @@ class Controller(object):
     def ports_scan(uid):
         """
         添加域名扫描任务
-        :param domain: example.com
         :param uid: c2385a01-bb0a-40a3-8694-05a31a440ba6
         :return:
         """

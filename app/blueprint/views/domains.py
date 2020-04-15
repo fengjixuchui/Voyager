@@ -94,7 +94,6 @@ def domains_controllers():
                     "user": session.get("admin")}
 
             mongo.db.tasks.insert_one(task)
-            print(task_id)
 
             Controller.subdomain_scan(task_id)
 
