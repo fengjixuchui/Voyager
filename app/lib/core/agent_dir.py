@@ -189,7 +189,7 @@ class ControllerDirs():
         for i in info:
             target = str(json.dumps(i, ensure_ascii=False))
 
-            contain = DOCKER_CLIENT.containers.run("ap0llo/dirsearch:test", [target], detach=True, remove=True,
+            contain = DOCKER_CLIENT.containers.run("ap0llo/dirsearch:0.3.9", [target], detach=True, remove=True,
                                                    auto_remove=True,
                                                    network="host")
 

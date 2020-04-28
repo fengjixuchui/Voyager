@@ -33,12 +33,17 @@ class ControllerPocs(object):
     def _waf_check(self):
 
         list_queue = queue.Queue()
+        new_port_lit = list()
 
         ports = mongo.db.ports.find({"parent_name": self.task_name})
+
         domains = mongo.db.subdomains.find({"parent_name": self.task_name})
 
         for j in ports:
-            self.target_queue.put_nowait(j)
+            if j["service"] in ['https', 'ssl', 'http']:
+                self.target_queue.put_nowait(j)
+            else:
+                new_port_lit.append(j)
 
         for k in domains:
             self.target_queue.put_nowait(k)
@@ -73,7 +78,7 @@ class ControllerPocs(object):
 
                 self.threads_queue.put(" ")
 
-        return list(list_queue.queue)
+        return list(list_queue.queue) + new_port_lit
 
     # cms指纹识别函数
     def _cms_finger(self, target_list):
